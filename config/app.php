@@ -29,15 +29,6 @@ return [
     
     // 服务配置
     'services' => [
-        // 特殊服务的配置（需要依赖注入的复杂服务）
-        PHPFrame\Database\Migration::class => [
-            'class' => 'PHPFrame\Database\Migration',
-            'dependencies' => ['db']
-        ],
-        
-        App\Controllers\Shell\DatabaseShell::class => [
-            'class' => 'App\Controllers\Shell\DatabaseShell',
-            'dependencies' => [PHPFrame\Database\Migration::class]
-        ]
+
     ]
 ];
