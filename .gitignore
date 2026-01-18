@@ -1,0 +1,16 @@
+.user.ini
+.DS_Store
+.idea/
+.trae/
+.env
+vendor
+node_modules
+runtime/
+storage/
+public/admin/
+public/uploads/
+database/migrations/
+composer.lock
+tests/
+*test*.php
+*debug*.php
