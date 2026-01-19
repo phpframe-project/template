@@ -16,9 +16,9 @@ class DatabaseShell extends BaseShell
      * 显示表结构信息
      * 调用: php shell.php database/describe table_name
      */
-    public function describeAction($args)
+    public function describeAction()
     {
-        $tableName = $args[0] ?? null;
+        $tableName = $this->getParam(0, null);
 
         if (empty($tableName)) {
             $this->output("请提供表名", 'error');
@@ -69,7 +69,7 @@ class DatabaseShell extends BaseShell
      * 显示所有表列表
      * 调用: php shell.php database/tables
      */
-    public function tablesAction($args)
+    public function tablesAction()
     {
         try {
             $this->output("数据库表列表:");
@@ -118,7 +118,7 @@ class DatabaseShell extends BaseShell
      * 导出数据库结构到Markdown文件
      * 调用: php shell.php database/build-structure
      */
-    public function structureAction($args)
+    public function structureAction()
     {
         try {
             $this->output("开始导出数据库结构...");
@@ -163,7 +163,7 @@ class DatabaseShell extends BaseShell
      * 生成模型字段类
      * 调用: php shell.php database/build-model-fields
      */
-    public function fieldsAction($args)
+    public function fieldsAction()
     {
         try {
             $this->output("开始生成模型字段类...");

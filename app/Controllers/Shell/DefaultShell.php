@@ -16,9 +16,9 @@ class DefaultShell extends BaseShell
      * 测试命令
      * 调用: php shell.php default/test name=user1 email=user1@example.com
      */
-    public function testAction($args)
+    public function testAction()
     {
-        $params = $this->parseArgs($args);
+        $params = $this->getParams();
 
         // 参数验证
         if (empty($params['name']) || empty($params['email'])) {

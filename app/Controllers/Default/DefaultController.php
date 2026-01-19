@@ -2,8 +2,6 @@
 
 namespace App\Controllers\Default;
 
-use PHPFrame\BaseController;
-
 class DefaultController extends Controller
 {
     public function __construct()
