@@ -7,11 +7,6 @@ use PHPFrame\Facades\Db;
 
 class DatabaseShell extends BaseShell
 {
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     /**
      * 显示表结构信息
      * 调用: php shell.php database/describe table_name

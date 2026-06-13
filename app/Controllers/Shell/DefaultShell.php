@@ -6,12 +6,6 @@ use PHPFrame\BaseShell;
 
 class DefaultShell extends BaseShell
 {
-
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     /**
      * 测试命令
      * 调用: php shell.php default/test name=user1 email=user1@example.com
@@ -27,7 +21,8 @@ class DefaultShell extends BaseShell
         }
 
         $this->output("测试参数: " . json_encode($params));
+        $this->log("测试命令执行完成，参数: " . json_encode($params));
 
+        return 0;
     }
-
 }
