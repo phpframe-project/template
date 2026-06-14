@@ -25,9 +25,14 @@ app/
     Default/          # HTTP 控制器，继承 BaseController → Controller
     Shell/            # Shell 控制器，继承 BaseShell
   Library/            # 自定义类库
-  Models/             # 数据模型
+  Middleware/         # 中间件（实现 MiddlewareInterface）
+  Models/             # 数据模型（Eloquent ORM）
   Services/           # 业务服务
 config/               # 配置文件，文件名即配置组键名
+database/
+  field_template.php  # 模型字段生成模板
+resources/
+  templates/          # Twig 模板
 routes/
   default.php         # HTTP 路由（GET/POST/PUT/DELETE）
   shell.php           # Shell 路由
@@ -103,7 +108,7 @@ $this->request->post();           // 所有 POST 参数
 
 ### JSON 请求体
 
-框架自动解析 `Content-Type: application/json` 请求，JSON 数据合并到 `post()` 和 `get()` 可访问的属性中，无需手动处理：
+框架自动解析 `Content-Type: application/json` 请求，JSON 数据合并到 `post()` 可访问的属性中，无需手动处理：
 
 ```php
 // 客户端发送 JSON: {"name": "John", "email": "john@example.com"}
@@ -111,7 +116,7 @@ $name = $this->request->post('name');   // 'John'
 $email = $this->getParam('email');      // 'john@example.com'
 ```
 
-框架不会修改 `$_POST` / `$_REQUEST` 超全局变量，JSON 数据仅通过 Request 对象提供。
+> FPM 模式下 `createFromGlobals()` 会自动将 JSON 数据合并到 `post()`；CLI 模式下 ReactPHP 已自动解析到 `getParsedBody()`，同样通过 `post()` 访问。框架不会修改 `$_POST` / `$_REQUEST` 超全局变量。
 
 ### 响应
 
@@ -142,7 +147,9 @@ Log::info('message', ['context' => 'data']);
 Db::table('users')->get();
 Cache::set('key', 'value', 3600);
 Config::get('app.name');
-App::env();
+App::get('db');         // 从容器获取服务
+App::has('cache');      // 检查服务是否存在
+App::set('my', fn() => new MyService());  // 注册服务
 ```
 
 ### 中间件
@@ -405,12 +412,15 @@ $users = $userService->listUsers($page);
 | 函数 | 说明 |
 |------|------|
 | `app($id)` | 获取容器实例或解析服务 |
-| `config($key, $default)` | 读取配置 |
+| `config($key, $default)` | 读取配置（仅支持获取，设置用 `app('config')->set()`） |
 | `env($key, $default)` | 读取环境变量 |
-| `base_path($path)` | 项目根目录 |
-| `app_path($path)` | app 目录 |
+| `root_path($path)` | 项目根目录 |
 | `config_path($path)` | config 目录 |
 | `runtime_path($path)` | runtime 目录 |
 | `public_path($path)` | public 目录 |
+| `resource_path($path)` | resources 目录 |
 | `database_path($path)` | database 目录 |
 | `logger()` | 获取 Logger 实例 |
+| `dd(...$vars)` | 调试输出并终止 |
+| `array_get($array, $key, $default)` | 安全获取数组值（支持点号分隔键） |
+| `isolate_request($force)` | 执行请求级状态隔离（常驻内存模式） |

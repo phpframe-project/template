@@ -25,6 +25,6 @@ class AuthMiddleware implements MiddlewareInterface
     {
         // 替换为实际的 Token 验证逻辑
         $secret = config('app.secret', '');
-        return !empty($secret) && $token === $secret;
+        return $secret !== '' && $token === $secret;
     }
 }

@@ -36,8 +36,13 @@ my-project/
 │   │       ├── DefaultShell.php
 │   │       └── DatabaseShell.php
 │   ├── Library/                  # 自定义类库
-│   ├── Models/                   # 数据模型
+│   ├── Middleware/               # 中间件
+│   │   ├── AuthMiddleware.php
+│   │   └── CorsMiddleware.php
+│   ├── Models/                   # 数据模型（Eloquent）
+│   │   └── User.php
 │   └── Services/                 # 业务服务
+│       └── UserService.php
 ├── config/                       # 配置文件（自动加载）
 │   ├── app.php                   # 应用配置
 │   ├── database.php              # 数据库配置
@@ -234,8 +239,8 @@ config/app.production.php     # 生产环境覆盖（APP_ENV=production 时自�
 config('app.name');
 config('database.connections.default.host', '127.0.0.1');
 
-// 运行时修改
-config('app.debug', true);
+// 运行时修改（不持久化）
+app('config')->set('app.debug', true);
 ```
 
 ### 缓存
