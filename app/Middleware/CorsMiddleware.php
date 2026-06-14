@@ -19,7 +19,8 @@ class CorsMiddleware implements MiddlewareInterface
             header('Access-Control-Allow-Headers: Content-Type, Authorization');
 
             // OPTIONS 预检请求直接返回
-            if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+            $method = app('request')->server('REQUEST_METHOD', '');
+            if ($method === 'OPTIONS') {
                 http_response_code(204);
                 return '';
             }

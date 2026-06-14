@@ -99,6 +99,18 @@ $this->request->post();           // 所有 POST 参数
 
 **禁止**直接访问 `$_GET`、`$_POST`、`$_REQUEST`、`$_SERVER` 等超全局变量。
 
+### JSON 请求体
+
+框架自动解析 `Content-Type: application/json` 请求，JSON 数据合并到 `post()` 和 `get()` 可访问的属性中，无需手动处理：
+
+```php
+// 客户端发送 JSON: {"name": "John", "email": "john@example.com"}
+$name = $this->request->post('name');   // 'John'
+$email = $this->getParam('email');      // 'john@example.com'
+```
+
+框架不会修改 `$_POST` / `$_REQUEST` 超全局变量，JSON 数据仅通过 Request 对象提供。
+
 ### 响应
 
 ```php
@@ -168,14 +180,16 @@ app()->set('my_service', function ($c) {
 });
 
 // 原型（每次 get() 返回新实例）
-app()->prototype('request', function ($c) {
-    return new Request();
+app()->prototype('my_request', function ($c) {
+    return new MyRequest();
 });
 
 // 使用
 $service = app('my_service');
 $service = app()->get('my_service');
 ```
+
+> 注意：`request` 服务在 CLI 常驻内存模式下自动注册为原型服务，每次解析返回新实例，避免请求间状态污染。
 
 ### 配置
 
@@ -266,6 +280,18 @@ Db::select('SELECT * FROM users WHERE id = ?', [$id]);
 - 自定义服务有请求级状态时，注册到 `RequestIsolationManager`
 - 日志文件按日期自动轮转，无需手动处理
 - Worker 进程崩溃后主进程会自动重启
+- `request` 服务在 CLI 模式下为原型服务，每次解析返回新实例
+
+## 参数验证注意事项
+
+- **禁止**使用 `empty()` 验证必填字段，`empty('0')` 返回 `true` 会导致 "0" 值被误判为空
+- 使用 `!isset($value) || $value === ''` 替代 `empty($value)` 进行必填验证
+- 框架 `Validation` 组件已修复此问题，自定义验证逻辑也需注意
+
+## 控制器 before() 钩子
+
+- `before()` 中抛出的异常会正常传播到异常处理器，不会被静默吞掉
+- 可用于权限检查、参数预处理等前置逻辑
 
 ## 辅助函数
 
