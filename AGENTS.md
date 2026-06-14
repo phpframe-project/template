@@ -43,6 +43,8 @@ shell.php             # Shell 入口
 - 控制器：`PascalCase` + `Controller` 后缀，如 `UserController`
 - 控制器方法：`camelCase` + `Action` 后缀，如 `listAction`、`createAction`
 - Shell 控制器：`PascalCase` + `Shell` 后缀，如 `DatabaseShell`
+- Model：`PascalCase` 单数形式，如 `User`、`OrderItem`
+- Service：`PascalCase` + `Service` 后缀，如 `UserService`
 - 路由路径：`snake_case`，如 `/user-profile`
 - 配置键：`snake_case`，如 `database.connections.default.host`
 
@@ -250,6 +252,99 @@ Db::transaction(function () {
 Db::select('SELECT * FROM users WHERE id = ?', [$id]);
 ```
 
+### Model
+
+Model 使用 Eloquent ORM，放在 `app/Models/` 目录：
+
+```php
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class User extends Model
+{
+    protected $table = 'users';
+    protected $fillable = ['name', 'email', 'active'];
+    protected $hidden = ['password'];
+    protected $casts = ['active' => 'boolean'];
+
+    public function scopeActive($query)
+    {
+        return $query->where('active', 1);
+    }
+}
+```
+
+使用：
+
+```php
+use App\Models\User;
+
+// 查询
+$users = User::active()->get();
+$user = User::find($id);
+
+// 创建
+$user = User::create(['name' => 'John', 'email' => 'john@example.com']);
+
+// 更新
+$user->update(['name' => 'Jane']);
+
+// 删除
+$user->delete();
+```
+
+> 可通过 `php shell.php database/build-model-fields` 自动生成字段常量类到 `app/Models/Fields/`。
+
+### Service
+
+Service 封装业务逻辑，放在 `app/Services/` 目录，通过容器注册使用：
+
+```php
+namespace App\Services;
+
+use App\Models\User;
+use PHPFrame\Facades\Db;
+use PHPFrame\Facades\Cache;
+use PHPFrame\Facades\Log;
+
+class UserService
+{
+    public function listUsers(int $page = 1): array
+    {
+        return Cache::remember("users:page:{$page}", 60, function () use ($page) {
+            return User::active()->paginate(15, ['*'], 'page', $page)->toArray();
+        });
+    }
+
+    public function createUser(array $data): User
+    {
+        return Db::transaction(function () use ($data) {
+            $user = User::create($data);
+            Log::info('User created', ['user_id' => $user->id]);
+            return $user;
+        });
+    }
+}
+```
+
+注册到容器（在 `routes/default.php` 或自定义引导文件中）：
+
+```php
+app()->set(UserService::class, function ($c) {
+    return new UserService();
+});
+```
+
+在控制器中使用：
+
+```php
+$userService = app(UserService::class);
+$users = $userService->listUsers($page);
+```
+
+> 推荐将业务逻辑放在 Service 层，控制器只负责参数获取、调用 Service、返回响应。
+
 ## 常见模式
 
 ### 新增 HTTP 控制器
@@ -273,6 +368,18 @@ Db::select('SELECT * FROM users WHERE id = ?', [$id]);
 
 1. 实现 `PHPFrame\Middleware\MiddlewareInterface`
 2. 在路由文件中注册（全局或路由级）
+
+### 新增 Model
+
+1. 在 `app/Models/` 创建 Model 类，继承 `Illuminate\Database\Eloquent\Model`
+2. 定义 `$table`、`$fillable`、`$hidden`、`$casts` 等属性
+3. 可选：运行 `php shell.php database/build-model-fields` 生成字段常量类
+
+### 新增 Service
+
+1. 在 `app/Services/` 创建 Service 类
+2. 通过 `app()->set(ServiceClass::class, ...)` 注册到容器
+3. 在控制器中通过 `app(ServiceClass::class)` 获取使用
 
 ## CLI 常驻模式注意事项
 

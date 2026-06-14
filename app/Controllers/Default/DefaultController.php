@@ -3,6 +3,7 @@
 namespace App\Controllers\Default;
 
 use PHPFrame\Facades\Db;
+use App\Services\UserService;
 
 class DefaultController extends Controller
 {
@@ -39,5 +40,21 @@ class DefaultController extends Controller
         } catch (\Exception $e) {
             return $this->error('数据库连接失败: ' . $e->getMessage(), 500);
         }
+    }
+
+    /**
+     * 用户列表示例 - 演示 Service 层用法
+     * 调用: GET /users?page=1
+     */
+    public function usersAction()
+    {
+        $page = (int) $this->getParam('page', 1);
+        $userService = app(UserService::class);
+        $users = $userService->listUsers($page);
+
+        return $this->json([
+            'code' => 0,
+            'data' => $users,
+        ]);
     }
 }

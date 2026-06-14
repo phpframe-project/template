@@ -19,6 +19,9 @@ Route::get('/test', [DefaultController::class, 'testAction']);
 // 数据库连接测试
 Route::get('/db-test', [DefaultController::class, 'dbTestAction']);
 
+// 用户列表示例（演示 Model/Service 用法）
+Route::get('/users', [DefaultController::class, 'usersAction']);
+
 // 路由组
 Route::group('/tests', function () {
     Route::get('/test1', [DefaultController::class, 'testAction']);
