@@ -428,3 +428,7 @@ $users = $userService->listUsers($page);
 | `dd(...$vars)` | 调试输出并终止 |
 | `array_get($array, $key, $default)` | 安全获取数组值（支持点号分隔键） |
 | `isolate_request($force)` | 执行请求级状态隔离（常驻内存模式） |
+
+## 更多文档
+
+框架完整文档位于 `vendor/phpframe-project/phpframe/docs/` 目录。
