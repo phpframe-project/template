@@ -102,6 +102,8 @@ $this->request->query('key');     // GET 参数
 $this->request->post('key');      // POST 参数
 $this->request->query();          // 所有 GET 参数
 $this->request->post();           // 所有 POST 参数
+$this->request->server();         // 所有 Server 参数
+$this->request->files();          // 所有上传文件
 ```
 
 **禁止**直接访问 `$_GET`、`$_POST`、`$_REQUEST`、`$_SERVER` 等超全局变量。
@@ -179,6 +181,8 @@ Route::middleware(new CorsMiddleware());
 Route::registerMiddleware('auth', new AuthMiddleware());
 Route::handlerMiddleware('App\Controllers\UserController@profile', ['auth']);
 ```
+
+> 中间件通过 `Route` 门面注册时采用延迟机制：先暂存到内部队列，待 `RouteManager` 创建后由框架自动统一应用。开发者无需关心 `RouteManager` 的初始化时机。
 
 ### 依赖注入
 
