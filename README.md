@@ -75,6 +75,15 @@ my-project/
 php -S localhost:8000 -t public/
 ```
 
+#### Nginx配置
+请确保，如下面的配置所示，您的 Web 服务器将所有请求定向到您的应用程序的 public/index.php 文件。您永远不应该尝试将 index.php 文件移动到项目的根目录，因为从项目根目录提供应用程序将会将许多敏感的配置文件暴露给公共互联网
+```bash
+ location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+```
+
+
 ### CLI 模式（ReactPHP 常驻内存）
 
 高性能常驻内存服务器，支持多 Worker 进程：
